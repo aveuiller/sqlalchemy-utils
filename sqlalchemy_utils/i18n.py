@@ -15,12 +15,17 @@ except ImportError:
 try:
     from flask_babel import get_locale
 except ImportError:
-    def get_locale():
-        raise ImproperlyConfigured(
-            'Could not load get_locale function from Flask-Babel. Either '
-            'install Flask-Babel or make a similar function and override it '
-            'in this module.'
-        )
+    try:
+        # Defining default locale to 'en' to avoid crash without Flask-Babel
+        get_locale = lambda: babel.Locale('en')
+    except AttributeError:
+        # As babel is optional, we may raise an AttributeError accessing it
+        def get_locale():
+            raise ImproperlyConfigured(
+                'Could not load get_locale function from Flask-Babel. Either '
+                'install Babel, Flask-Babel or make a similar function '
+                'and override it in this module.'
+            )
 
 
 def cast_locale(obj, locale):
